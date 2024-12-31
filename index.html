@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AGC Membership Registration</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #ff9a9e, #fad0c4, #fbc2eb);
+      overflow: hidden;
+    }
+    .floating-shape {
+      position: absolute;
+      border-radius: 50%;
+      animation: float 4s infinite ease-in-out;
+    }
+    .container {
+      background: linear-gradient(to bottom right, #ffffff, #e8f0ff);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      width: 400px;
+      padding: 20px 30px;
+      text-align: center;
+      animation: slideIn 1s ease-out;
+    }
+    form input, form select, form button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    form button {
+      background: linear-gradient(to bottom right, #4CAF50, #8BC34A);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+    }
+    .table-container {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 800px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #4CAF50;
+      color: white;
+    }
+    .action-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .edit-btn {
+      background-color: #ffa726;
+      color: white;
+    }
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 style="font-size: 24px; color: #5b7db1; margin-bottom: 20px;">AGC Membership Registration</h2>
+    <form id="dataForm">
+      <input type="text" id="name" placeholder="Your Name" required />
+      <select id="day" required>
+        <option value="">Select Day</option>
+        <script>
+          for (let i = 1; i <= 31; i++) {
+            document.write(`<option value="${i}">${i}</option>`);
+          }
+        </script>
+      </select>
+      <select id="month" required>
+        <option value="">Select Month</option>
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+      </select>
+      <input type="text" id="cellChurch" placeholder="Cell/Church" required />
+      <input type="tel" id="phone" placeholder="Phone Number (e.g., 7064959669)" pattern="[0-9]{10}" required />
+      <button type="submit">Submit</button>
+    </form>
+    <p id="responseMessage" style="color: #4CAF50; margin-top: 10px;"></p>
+  </div>
+
+  <div class="table-container">
+    <table id="submissionTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Day</th>
+          <th>Month</th>
+          <th>Cell/Church</th>
+          <th>Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dynamic rows will be added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const form = document.getElementById('dataForm');
+    const tableBody = document.querySelector('#submissionTable tbody');
+    const responseMessage = document.getElementById('responseMessage');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Form data
+      const name = document.getElementById('name').value.trim();
+      const day = document.getElementById('day').value;
+      const month = document.getElementById('month').value;
+      const cellChurch = document.getElementById('cellChurch').value.trim();
+      const phone = `+234${document.getElementById('phone').value.trim().replace(/^0/, '')}`;
+
+      // Display in the table
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${name}</td>
+        <td>${day}</td>
+        <td>${month}</td>
+        <td>${cellChurch}</td>
+        <td>${phone}</td>
+        <td>
+          <button class="action-btn edit-btn">Edit</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+
+      // Add event listeners to the buttons
+      row.querySelector('.edit-btn').addEventListener('click', () => editRow(row));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteRow(row));
+
+      // Limit the number of rows to the latest three submissions
+      const rows = tableBody.querySelectorAll('tr');
+      if (rows.length > 3) {
+        tableBody.removeChild(rows[0]); // Remove the oldest row
+      }
+
+      // Reset form and show success message
+      form.reset();
+      responseMessage.textContent = 'Form submitted successfully!';
+      setTimeout(() => (responseMessage.textContent = ''), 3000);
+    });
+
+    function editRow(row) {
+      const cells = row.querySelectorAll('td');
+      document.getElementById('name').value = cells[0].textContent;
+      document.getElementById('day').value = cells[1].textContent;
+      document.getElementById('month').value = cells[2].textContent;
+      document.getElementById('cellChurch').value = cells[3].textContent;
+      document.getElementById('phone').value = cells[4].textContent.replace('+234', '');
+      row.remove();
+    }
+
+    function deleteRow(row) {
+      row.remove();
+      responseMessage.textContent = 'Entry deleted successfully!';
+      setTimeout(() => (responseMessage.textContent = ''), 3000);
+    }
+  </script>
+</body>
+</html>
